@@ -1,0 +1,98 @@
+#hero {
+    /*
+        MODELO DE CAJA PARA TODA
+        LA PAGINA DE LOGIN
+    */  
+    height: 100%;
+    width: 100%;
+    padding: 50px;
+    border: 0px solid gainsboro;
+    margin: 0px;
+    background-color: white;
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.signup_input_field {
+    /*
+        MODELO DE CAJA PARA TODO
+        CAMPO DE ENTRADA EN LA PÁGINA DE SIGNUP.
+    */
+    height: 100px;
+    width: 100px;
+    padding: 0px;
+    border: 0px solid gainsboro;
+    margin: 0px;
+    background-color: white;
+    border-radius: 10px;
+    overflow-x: auto;
+
+    align-items: center;
+    
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.signup_input_img {
+    /*
+        MODELO DE CAJA PARA TODO
+        CAMPO DE ENTRADA EN LA PÁGINA DE SIGNUP.
+    */
+    height: 100px;
+    width: 100px;
+    padding: 0px;
+    border: 0px solid gainsboro;
+    margin: 0px;
+    background-color: white;
+    border-radius: 10px;
+    overflow-x: auto;
+
+    align-items: center;
+    
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.signup_submit_button {
+    /*
+        MODELO DE CAJA PARA TODO
+        BOTON DE SUBMIT EN LA PÁGINA DE SIGNUP.
+    */
+    height: 40px;
+    width: 60px;
+    padding: 0px;
+    border: 0px solid gainsboro;
+    margin: 0px;
+    background-color: white;
+    border-radius: 10px;
+    overflow-x: auto;
+
+    align-items: center;
+
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#profile_img {
+    /*
+        MODELO DE CAJA PARA EL PREVIEW
+        DE LA IMAGEN DE PERFIL EN LA PÁGINA DE SIGNUP.
+    */
+    height: 100px;
+    width: 150px;
+    padding: 0px;
+    border: 0px solid gainsboro;
+    margin: 0px;
+    background-color: white;
+    border-radius: 10px;
+    overflow-x: auto;
+
+    align-items: center;
+
+    text-align: center;
+    font-size: 20px;
+    font-family: 'Courier New', Courier, monospace;
+}
