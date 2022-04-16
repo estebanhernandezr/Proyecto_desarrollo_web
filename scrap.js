@@ -1,7 +1,14 @@
-import fetch from "node-fetch";
-//import fetch from "node-fetch";
-import { load } from "cheerio";
-//import cheerio from "cheerio";
+//const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const cheerio = require('cheerio');
+const { val } = require('cheerio/lib/api/attributes');
+
+// objects to store information
+const movie = {
+    title: "default_title",
+    meta: "default_metadata",
+    descrp: "default_descrp"
+};
 
 // function to get the raw data from URL
 const get_raw_data = (URL) => {
@@ -12,20 +19,25 @@ const get_raw_data = (URL) => {
     });
 };
 
-var movie_titles = [];
-var movie_medata = [];
-var movie_descrp = [];
 // function to get the parsed data from URL
 const get_data = async (URL) => {
+    let movie_titles = [];
+    let movie_medata = [];
+    let movie_descrp = [];
+
+    var movies = {
+        entries: [],
+    }
+
     const raw_data = await get_raw_data(URL);
 
     // parsing the data
-    const parsed_data = load(raw_data);
+    const parsed_data = cheerio.load(raw_data);
 
     // extracting the wanted element
     const loaded_cheerio = parsed_data('.title_bump');
     const title_bump = loaded_cheerio['0'];
-    console.log(title_bump);
+    //console.log(title_bump);
     const title_bump_children = title_bump['children'];
     title_bump_children.forEach((title_bump_child) => {
         if (title_bump_child['name'] == 'div') {
@@ -54,7 +66,7 @@ const get_data = async (URL) => {
                                                                 const h3_children = a_child['children'];
                                                                 h3_children.forEach((h3_child) => {
                                                                     if (h3_child['type'] == 'text') {
-                                                                        console.log(h3_child['data']);
+                                                                        //console.log(h3_child['data']);
                                                                         movie_titles.push(h3_child['data']);
                                                                     }
                                                                 });
@@ -67,7 +79,7 @@ const get_data = async (URL) => {
                                                                 const span_children = clamp_details_child['children'];
                                                                 span_children.forEach((span_child) => {
                                                                     if (span_child['type'] == 'text') {
-                                                                        console.log(span_child['data']);
+                                                                        //console.log(span_child['data']);
                                                                         movie_medata.push(span_child['data']);
                                                                     }
                                                                 });
@@ -77,7 +89,7 @@ const get_data = async (URL) => {
                                                         const summary_children = td_child['children'];
                                                         summary_children.forEach((summary_child) => {
                                                             if (summary_child['type'] == 'text') {
-                                                                console.log(summary_child['data']);
+                                                                //console.log(summary_child['data']);
                                                                 movie_descrp.push(summary_child['data']);
                                                             }
                                                         });
@@ -94,15 +106,29 @@ const get_data = async (URL) => {
             }
         }
     });
-    console.log(movie_titles);
-    console.log(movie_medata);
-    console.log(movie_descrp);
+    //console.log(movie_titles);
+    //console.log(movie_medata);
+    //console.log(movie_descrp);
+    movie_titles.forEach((title, idx) => {
+        let movie ={
+            title: movie_titles[idx],
+            meta: movie_medata[idx],
+            descrp: movie_descrp[idx]
+        };
+        movies['entries'].push(movie);
+    });
+    //console.log(movies);
+    return movies;
 };
 
+// URL for data
+const URL = 'https://www.metacritic.com/browse/movies/release-date/theaters/date';
+// invoking the main function
+//get_data(URL);
 
-$(document).ready(function () {
-    const URL = 'https://www.metacritic.com/browse/movies/release-date/theaters/date';
-    get_data(URL);
-    alert(movie_titles.length);
-});
+module.exports = {
+    get_scrapped_data: async function() {
+        return get_data(URL);
+    },
+};
 
