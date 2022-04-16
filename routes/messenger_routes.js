@@ -1,40 +1,80 @@
-/*PARÁMETROS*/
+/* IMPORTS */
 const express = require('express');
-const database = require('../database/connection');
-const ObjectID = require('mongodb').ObjectId;
-const scrapper = require('../javascript/scrap'); // <-----------WATCH OUT HERE!
+const consulter = require('../javascript/consult_logic'); // <-----------WATCH OUT HERE!
+const all_consulter = require('../javascript/showall_logic'); // <-----------WATCH OUT HERE!
+const exceler = require('../javascript/excel'); // <-----------WATCH OUT HERE!
+const sender = require('../javascript/send_logic'); // <-----------WATCH OUT HERE!
+const setter = require('../javascript/setstate_logic'); // <-----------WATCH OUT HERE!
 
-/*VARIABLES GLOBALES*/
+/* VARIABLES GLOBALES */
 const routes = express.Router();
-var collection_name = 'packets';
 
-/*EXPORTS*/
-routes.route('/').get(async function (_req, res) {
-    res.send('Messenger server is runnning already...')
-    const connection = database.get_database();
-    connection.collection(collection_name).remove( { } );
-    const options = { upsert: true };
-    scrapper.get_scrapped_data().then(val => {
-        console.log(val)
-        let movies = val['entries'];
-        movies.forEach(movie => {
-            connection.collection(collection_name).insertOne(movie);
+/* CONSULTAR ENVIO (POR CODIGO DE ENVIO) */
+routes.route('/consult/:tipo_consulta').get((req, res) => {
+    try {
+        consulter.consult_envio(req, res);
+        console.log("Sucessfull consulting!");
+    } catch (error) {
+        console.log('Caught error on consult: ', error);
+        res.status(500).send({
+            message: "Could not consult the file: " + req.file.originalname,
         });
-        console.log('----> Aquí terminamos <----');
-    });
+    }
+});
+/* CONSULTAR ENVIOS DE TODOS */
+routes.route('/consult_all').get((req, res) => {
+    try {
+        all_consulter.mostrar_registros(req, res);
+        console.log("Sucessfull all consulting!");
+    } catch (error) {
+        console.log('Caught error on consult all: ', error);
+        res.status(500).send({
+            message: "Could not consult all the fail: " + req.file.originalname,
+        });
+    }
 });
 
-routes.route('/packets').get(async function(_req, res) {
-    const connection = database.get_database();
-    connection.collection(collection_name).find({
-
-    }).toArray(function(err, result) {
-        if (err) {
-            res.status(400).send('Error finding the item');
-        } else {
-            res.json(result);
+/* ESTABLECER ESTADO DEL ENVIO (POR CODIGO DE ENVIO) */
+routes.route('/set_estado/:codigo_envio').put((req, res) => {
+    try {
+        setter.set_estado(req, res);
+        console.log("Sucessfull setting!");
+    } catch (error) {
+        console.log('Caught error on setting: ', error);
+        res.status(500).send({
+            message: "Could not upload the file: " + req.file.originalname,
+        });
+    }
+});
+/* REGISTRAR UN NUEVO ENVIO Y SU CODIGO (DADA SU DESCRIPCION JSON) */
+routes.route('/send').post((req, res) => {
+    try {
+        sender.send(req, res);
+        console.log("Sucessfull insertion!");
+    } catch (error) {
+        console.log('Caught error on sending: ', error);
+        res.status(500).send({
+            message: "Could not send the file: " + req.file.originalname,
+        });
+    }
+});
+/* ALMACENAR EN MONGODB LOS REGISTROS DE ENVIOS (DADOS EN UN ARCHIVO CSV) */
+routes.route('/upload_csv').post(exceler.upload.single('file'), (req, res) => {
+    try {
+        console.log(req.file);
+        if (req.file == undefined) {
+            res.status(400).send({
+                message: "Please upload a CSV file",
+            });
         }
-    });
+        exceler.upload_local_file(req, res);
+    } catch (error) {
+        console.log('Caught error: ', error);
+        res.status(500).send({
+            message: "Could not upload the file: " + req.file.originalname,
+        });
+    }
 });
+
 
 module.exports = routes;

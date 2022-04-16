@@ -2,6 +2,7 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const cheerio = require('cheerio');
 const { val } = require('cheerio/lib/api/attributes');
+const database = require('../database/connection');
 
 // objects to store information
 const movie = {
@@ -127,8 +128,20 @@ const URL = 'https://www.metacritic.com/browse/movies/release-date/theaters/date
 //get_data(URL);
 
 module.exports = {
-    get_scrapped_data: async function() {
-        return get_data(URL);
+    get_scrapped_data: async function(req, res) {
+        const connection = database.get_database();
+        let collection_name = "coleccion_estrenos";
+        get_data(URL).then(val => {
+            let movies = val['entries'];
+            connection.collection(collection_name).insertMany(movies, function(err, _result) {
+                if (err) {
+                    res.status(400).send({ message: `Error on SCRAPPING!`});
+                } else {
+                    res.status(200).send({message: `Sucessed on SCRAPPING!`});
+                }
+            });
+            console.log('----> Aquí terminamos el SCRAPPING <----');
+        });
     },
 };
 
